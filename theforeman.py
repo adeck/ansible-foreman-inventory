@@ -174,7 +174,7 @@ They must be specified via ini file.'''
             return groups
 
         for host in hosts:
-            host_group = self._get_hostgroup_from_id(host.get('host').get('hostgroup_id'))
+            host_group = self._get_from_id('hostgroup', host.get('host').get('hostgroup_id'))
             server_name = host.get('host').get('name')
             groups[host_group].append(server_name)
 
