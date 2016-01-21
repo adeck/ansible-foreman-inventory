@@ -198,22 +198,30 @@ They must be specified via ini file.'''
         (self.args, self.options) = parser.parse_args()
 
 
-    def _get_from_id(self, param_name, param_id):
-        """Get architecture from id"""
-        " architecture, subnet, domain, compute_resource, model, environment, label, hostgroup, operatingsystem "
-        param = self._get_object_from_id(param, param_id)
+    def _get_from_id(self, param_type, param_id):
+        """Get value of type param_type and id param_id
+        The following values for param_type are explicitly accounted for:
+        - architecture
+        - subnet
+        - domain
+        - compute_resource
+        - model
+        - environment
+        - label
+        - hostgroup
+        - operatingsystem
+        """
+        param = self._get_object_from_id(param_type, param_id)
         if param is None:
             return None
-        if param_name == "hostgroup":
+        if param_type == "hostgroup":
             return param.get('label')
-        elif param_name == 'operatingsystem':
-            os_name = "{0}-{1}".format(os_obj.get('name'), os_obj.get('major'))
-            return os_name
+        elif param_type == 'operatingsystem':
+            return "{0}-{1}".format(param.get('name'), param.get('major'))
+        elif param_type == 'environment':
+            return param.get('name').lower()
         else:
-            result = param.get('name')
-            if param_name == "environment":
-                return result.lower()
-            return result
+            return param.get('name')
 
     def _get_object_from_id(self, obj_type, obj_id):
         """Get an object from it's ID"""
