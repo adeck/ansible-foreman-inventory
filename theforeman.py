@@ -141,16 +141,16 @@ They must be specified via ini file.'''
             'ip': meta.get('ip'),
             'name': meta.get('name'),
             'environment': meta.get('environment').get('environment').get('name').lower(),
-            'os': self._get_os_from_id(meta.get('operatingsystem_id')),
-            'model': self._get_model_from_id(meta.get('model_id')),
-            'compute_resource': self._get_compute_resource_from_id(meta.get('compute_resource_id')),
-            'domain': self._get_domain_from_id(meta.get('domain_id')),
-            'subnet': self._get_subnet_from_id(meta.get('subnet_id')),
-            'architecture': self._get_architecture_from_id(meta.get('architecture_id')),
+            'os': self._get_from_id('operatingsystem', meta.get('operatingsystem_id')),
+            'model': self._get_from_id('model', meta.get('model_id')),
+            'compute_resource': self._get_from_id('compute_resource', meta.get('compute_resource_id')),
+            'domain': self._get_from_id('domain', meta.get('domain_id')),
+            'subnet': self._get_from_id('subnet', meta.get('subnet_id')),
+            'architecture': self._get_from_id('architecture', meta.get('architecture_id')),
             'created': meta.get('created_at'),
             'updated': meta.get('updated_at'),
             'status': meta.get('status'),
-            'hostgroup': self._get_hostgroup_from_id(meta.get('hostgroup_id')),
+            'hostgroup': self._get_from_id('hostgroup', meta.get('hostgroup_id')),
             # to ssh from ansible
             'ansible_ssh_host': meta.get('ip'),
         }
@@ -197,69 +197,23 @@ They must be specified via ini file.'''
         parser.add_option('--host', action='store', help='Get all the variables about a specific instance')
         (self.args, self.options) = parser.parse_args()
 
-    def _get_os_from_id(self, os_id):
-        """Get operating system name"""
-        os_obj = self._get_object_from_id('operatingsystem', os_id)
-        if os_obj is None:
-            return os_obj
 
-        os_name = "{0}-{1}".format(os_obj.get('name'), os_obj.get('major'))
-        return os_name
-
-    def _get_hostgroup_from_id(self, host_id):
-        """Get hostgroup name"""
-        group = self._get_object_from_id('hostgroup', host_id)
-        if group is None:
-            return group
-
-        return group.get('label')
-
-    def _get_environment_from_id(self, env_id):
-        """Get environment name"""
-        environment = self._get_object_from_id('environment', env_id)
-        if environment is None:
-            return environment
-
-        return environment.get('name').lower()
-
-    def _get_model_from_id(self, model_id):
-        """Get model from an ID"""
-        model = self._get_object_from_id('model', model_id)
-        if model is None:
-            return model
-
-        return model.get('name')
-
-    def _get_compute_resource_from_id(self, resource_id):
-        """Get compute resource from id"""
-        compute_resource =  self._get_object_from_id('compute_resource', resource_id)
-        if compute_resource is None:
-            return compute_resource
-
-        return compute_resource.get('name')
-
-    def _get_domain_from_id(self, domain_id):
-        """Get domain from id"""
-        domain = self._get_object_from_id('domain', domain_id)
-        if domain is None:
-            return domain
-        return domain.get('name')
-
-    def _get_subnet_from_id(self, subnet_id):
-        """Get subnet from id"""
-        subnet = self._get_object_from_id('subnet', subnet_id)
-        if subnet is None:
-            return subnet
-
-        return subnet.get('name')
-
-    def _get_architecture_from_id(self, arch_id):
+    def _get_from_id(self, param_name, param_id):
         """Get architecture from id"""
-        arch = self._get_object_from_id('architecture', arch_id)
-        if arch is None:
+        " architecture, subnet, domain, compute_resource, model, environment, label, hostgroup, operatingsystem "
+        param = self._get_object_from_id(param, param_id)
+        if param is None:
             return None
-
-        return arch.get('name')
+        if param_name == "hostgroup":
+            return param.get('label')
+        elif param_name == 'operatingsystem':
+            os_name = "{0}-{1}".format(os_obj.get('name'), os_obj.get('major'))
+            return os_name
+        else:
+            result = param.get('name')
+            if param_name == "environment":
+                return result.lower()
+            return result
 
     def _get_object_from_id(self, obj_type, obj_id):
         """Get an object from it's ID"""
