@@ -199,7 +199,7 @@ They must be specified via ini file.'''
 
 
     def _get_from_id(self, param_type, param_id):
-        """Get value of type param_type and id param_id
+        """Get the object of type param_type associated with the ID param_id
         The following values for param_type are explicitly accounted for:
         - architecture
         - subnet
